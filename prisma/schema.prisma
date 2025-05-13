@@ -1,0 +1,53 @@
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String          @id
+  email         String          @unique
+  name          String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  videos        Video[]
+  sharedLinks   ShareableLink[] 
+}
+
+model Video {
+  id            String          @id @default(uuid())
+  fileName      String
+  fileUrl       String
+  fileSize      Int
+  duration      Int?            // Duration in seconds
+  thumbnailUrl  String?
+  userId        String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  sharedLinks   ShareableLink[]
+}
+
+model ShareableLink {
+  id            String          @id @default(uuid())
+  videoId       String
+  video         Video           @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  public        Boolean         @default(true)
+  accessEmails  String[]        // Emails of users who can access this link (for private sharing)
+  expiresAt     DateTime?       // Optional expiration date
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  clickCount    Int             @default(0)
+  lastAccessedAt DateTime?
+
+  @@index([videoId])
+  @@index([userId])
+}
+
