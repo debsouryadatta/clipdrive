@@ -7,6 +7,7 @@ import { ArrowRight, Upload, Share2, Lock, Play } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { SignedOut, SignInButton, SignUpButton } from "@clerk/nextjs";
+import { ModeToggle } from "@/components/ModeToggle";
 
 export default function LandingPage() {
   const { isSignedIn } = useUser();
@@ -50,6 +51,7 @@ export default function LandingPage() {
                   </Button>
                 </SignUpButton>
               </SignedOut>
+              <ModeToggle />
             </nav>
           </div>
         </div>
@@ -93,11 +95,11 @@ export default function LandingPage() {
                     priority
                   />
                   <div className="absolute bottom-4 left-4 z-20">
-                    <div className="flex items-center gap-2 bg-black/50 p-2 rounded-full backdrop-blur-sm pr-4 hover:bg-black/70 transition-colors cursor-pointer">
+                    <div className="flex items-center gap-2 bg-background/50 p-2 rounded-full backdrop-blur-sm pr-4 hover:bg-background/70 transition-colors cursor-pointer">
                       <div className="rounded-full bg-primary p-2">
                         <Play className="h-4 w-4 text-primary-foreground" />
                       </div>
-                      <span className="text-sm font-medium text-white">
+                      <span className="text-sm font-medium text-foreground">
                         Watch Demo
                       </span>
                     </div>
