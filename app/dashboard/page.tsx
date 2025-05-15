@@ -61,11 +61,11 @@ export default function DashboardPage() {
       <Tabs defaultValue="videos" className="w-full">
         <div className="flex justify-between items-center mb-6">
           <TabsList>
-            <TabsTrigger value="videos">Videos</TabsTrigger>
-            <TabsTrigger value="shared-links">Shared Links</TabsTrigger>
+            <TabsTrigger value="videos" className="cursor-pointer">Videos</TabsTrigger>
+            <TabsTrigger value="shared-links" className="cursor-pointer">Shared Links</TabsTrigger>
           </TabsList>
           
-          <Button onClick={() => setIsUploadDialogOpen(true)}>
+          <Button onClick={() => setIsUploadDialogOpen(true)} className="cursor-pointer">
             <Upload className="h-4 w-4" /> Upload
           </Button>
         </div>

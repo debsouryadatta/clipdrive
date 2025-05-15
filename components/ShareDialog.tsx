@@ -203,6 +203,7 @@ export default function ShareDialog({ open, onOpenChange, video }: ShareDialogPr
                 id="public-toggle" 
                 checked={isPublic}
                 onCheckedChange={setIsPublic}
+                className="cursor-pointer"
               />
             </div>
 
@@ -219,7 +220,7 @@ export default function ShareDialog({ open, onOpenChange, video }: ShareDialogPr
                     }}
                     className="flex-1"
                   />
-                  <Button onClick={handleAddEmail} disabled={isLoading}>
+                  <Button onClick={handleAddEmail} disabled={isLoading} className="cursor-pointer">
                     {isLoading ? "Checking..." : "Add"}
                   </Button>
                 </div>
@@ -259,7 +260,7 @@ export default function ShareDialog({ open, onOpenChange, video }: ShareDialogPr
                   variant={isSelected(null) ? "default" : "outline"}
                   size="sm"
                   onClick={() => handleSetExpiry(null)}
-                  className={isSelected(null) ? "font-medium" : ""}
+                  className={isSelected(null) ? "font-medium cursor-pointer" : "cursor-pointer"}
                 >
                   {isSelected(null) && <Check className="h-3.5 w-3.5 mr-1" />}
                   Never
@@ -268,7 +269,7 @@ export default function ShareDialog({ open, onOpenChange, video }: ShareDialogPr
                   variant={isSelected(1) ? "default" : "outline"}
                   size="sm"
                   onClick={() => handleSetExpiry(1)}
-                  className={isSelected(1) ? "font-medium" : ""}
+                  className={isSelected(1) ? "font-medium cursor-pointer" : "cursor-pointer"}
                 >
                   {isSelected(1) && <Check className="h-3.5 w-3.5 mr-1" />}
                   1 day
@@ -277,7 +278,7 @@ export default function ShareDialog({ open, onOpenChange, video }: ShareDialogPr
                   variant={isSelected(7) ? "default" : "outline"}
                   size="sm"
                   onClick={() => handleSetExpiry(7)}
-                  className={isSelected(7) ? "font-medium" : ""}
+                  className={isSelected(7) ? "font-medium cursor-pointer" : "cursor-pointer"}
                 >
                   {isSelected(7) && <Check className="h-3.5 w-3.5 mr-1" />}
                   7 days
@@ -286,7 +287,7 @@ export default function ShareDialog({ open, onOpenChange, video }: ShareDialogPr
                   variant={isSelected(30) ? "default" : "outline"}
                   size="sm"
                   onClick={() => handleSetExpiry(30)}
-                  className={isSelected(30) ? "font-medium" : ""}
+                  className={isSelected(30) ? "font-medium cursor-pointer" : "cursor-pointer"}
                 >
                   {isSelected(30) && <Check className="h-3.5 w-3.5 mr-1" />}
                   30 days
@@ -300,7 +301,7 @@ export default function ShareDialog({ open, onOpenChange, video }: ShareDialogPr
           {!linkGenerated ? (
             <Button 
               onClick={generateLink} 
-              className="w-full"
+              className="w-full cursor-pointer"
               disabled={isLoading || (!isPublic && accessEmails.length === 0)}
             >
               {isLoading ? (

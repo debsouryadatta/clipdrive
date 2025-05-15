@@ -67,13 +67,14 @@ export default function VideosTab() {
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {videos.map((video) => (
-          <Card key={video.id} className="overflow-hidden flex flex-col">
+          <Card key={video.id} className="overflow-hidden flex flex-col shadow-sm border p-0">
             <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
               {/* {video.thumbnailUrl ? (
                 <img
                   src={video.thumbnailUrl}
                   alt={video.fileName}
-                  className="absolute inset-0 w-full h-full object-cover"
+                  className="absolute inset-0 w-full 
+                  h-full object-cover"
                 />
               ) : ( */}
                 <div className="absolute inset-0 w-full h-full bg-slate-200 flex items-center justify-center">
@@ -88,13 +89,13 @@ export default function VideosTab() {
               )}
             </div>
             
-            <CardContent className="p-4 flex-grow">
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="font-medium text-lg">{video.fileName}</h3>
+            <CardContent className="p-3 pb-0 flex-grow">
+              <div className="flex justify-between items-start">
+                <h3 className="font-medium text-base truncate">{video.fileName}</h3>
                 <HoverCard>
                   <HoverCardTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <Info className="h-4 w-4" />
+                    <Button variant="ghost" size="icon" className="h-6 w-6 -mr-1 cursor-pointer">
+                      <Info className="h-3.5 w-3.5" />
                     </Button>
                   </HoverCardTrigger>
                   <HoverCardContent className="w-80">
@@ -111,7 +112,7 @@ export default function VideosTab() {
                   </HoverCardContent>
                 </HoverCard>
               </div>
-              <div className="flex items-center text-xs text-muted-foreground gap-3">
+              <div className="flex items-center text-xs text-muted-foreground gap-3 mt-1">
                 <div className="flex items-center gap-1">
                   <FileIcon className="h-3 w-3" />
                   {formatFileSize(video.fileSize)}
@@ -122,14 +123,14 @@ export default function VideosTab() {
               </div>
             </CardContent>
             
-            <CardFooter className="px-4 py-3 bg-muted border-t">
+            <CardFooter className="px-3 py-2 border-t mt-2">
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="w-full"
+                className="w-full h-8 cursor-pointer"
                 onClick={() => handleShare({ id: video.id, title: video.fileName })}
               >
-                <Share2 className="h-4 w-4 mr-2" />
+                <Share2 className="h-3.5 w-3.5 mr-1" />
                 Share
               </Button>
             </CardFooter>

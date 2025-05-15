@@ -98,6 +98,7 @@ export default function SharedLinksTab() {
                   size="icon" 
                   variant="outline"
                   onClick={() => copyToClipboard(link.id, link.url)}
+                  className="cursor-pointer"
                 >
                   {copiedId === link.id ? (
                     <Check className="h-4 w-4" />
