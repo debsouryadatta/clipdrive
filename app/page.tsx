@@ -3,15 +3,17 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Upload, Share2, Lock, Play } from "lucide-react";
+import { ArrowRight, Upload, Share2, Lock, Play, Menu, X } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { SignedOut, SignInButton, SignUpButton } from "@clerk/nextjs";
 import { ModeToggle } from "@/components/ModeToggle";
+import { useState } from "react";
 
 export default function LandingPage() {
   const { isSignedIn } = useUser();
   const router = useRouter();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   if (isSignedIn) {
     router.push("/dashboard");
@@ -20,41 +22,90 @@ export default function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
+        <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex gap-2 items-center text-xl font-bold">
             <Play className="h-6 w-6 text-primary" />
             <span>ClipDrive</span>
           </div>
-          <div className="flex flex-1 items-center justify-end space-x-4">
-            <nav className="flex items-center space-x-1">
+          
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-1">
+            <Link
+              href="#features"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground px-4 py-2"
+            >
+              Features
+            </Link>
+            <Link
+              href="#how-it-works"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground px-4 py-2"
+            >
+              How It Works
+            </Link>
+            <SignedOut>
+              <SignInButton mode="redirect">
+                <Button size="lg" className="px-8 cursor-pointer">
+                  Sign In
+                </Button>
+              </SignInButton>
+              <SignUpButton mode="redirect">
+                <Button size="lg" variant="outline" className="px-8 cursor-pointer">
+                  Sign Up
+                </Button>
+              </SignUpButton>
+            </SignedOut>
+            <ModeToggle />
+          </nav>
+          
+          {/* Mobile Menu Button */}
+          <div className="flex items-center md:hidden">
+            <ModeToggle />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="ml-2"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </Button>
+          </div>
+        </div>
+        
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden">
+            <div className="container mx-auto px-4 py-3 flex flex-col space-y-3 bg-background border-t">
               <Link
                 href="#features"
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground px-4 py-2"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground py-2"
+                onClick={() => setMobileMenuOpen(false)}
               >
                 Features
               </Link>
               <Link
                 href="#how-it-works"
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground px-4 py-2"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground py-2"
+                onClick={() => setMobileMenuOpen(false)}
               >
                 How It Works
               </Link>
               <SignedOut>
-                <SignInButton mode="redirect">
-                  <Button size="lg" className="px-8 cursor-pointer">
-                    Sign In
-                  </Button>
-                </SignInButton>
-                <SignUpButton mode="redirect">
-                  <Button size="lg" variant="outline" className="px-8 cursor-pointer">
-                    Sign Up
-                  </Button>
-                </SignUpButton>
+                <div className="flex flex-col space-y-2 pt-2">
+                  <SignInButton mode="redirect">
+                    <Button className="w-full cursor-pointer">
+                      Sign In
+                    </Button>
+                  </SignInButton>
+                  <SignUpButton mode="redirect">
+                    <Button variant="outline" className="w-full cursor-pointer">
+                      Sign Up
+                    </Button>
+                  </SignUpButton>
+                </div>
               </SignedOut>
-              <ModeToggle />
-            </nav>
+            </div>
           </div>
-        </div>
+        )}
       </header>
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
@@ -228,9 +279,11 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="mx-auto w-full max-w-sm space-y-2">
-                <Button size="lg" className="w-full">
-                  Sign up for free
-                </Button>
+                <SignUpButton mode="redirect">
+                  <Button size="lg" className="w-full">
+                    Sign up for free
+                  </Button>
+                </SignUpButton>
                 <p className="text-xs text-muted-foreground">
                   No credit card required. Start with our free plan today.
                 </p>
