@@ -47,6 +47,10 @@ export default function VideosTab() {
     setIsShareDialogOpen(true);
   };
 
+  const handleShareDialogClose = (open: boolean) => {
+    setIsShareDialogOpen(open);
+  };
+
   if (isLoading) {
     return <div className="flex justify-center py-10">Loading your videos...</div>;
   }
@@ -65,17 +69,17 @@ export default function VideosTab() {
         {videos.map((video) => (
           <Card key={video.id} className="overflow-hidden flex flex-col">
             <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-              {video.thumbnailUrl ? (
+              {/* {video.thumbnailUrl ? (
                 <img
                   src={video.thumbnailUrl}
                   alt={video.fileName}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
-              ) : (
+              ) : ( */}
                 <div className="absolute inset-0 w-full h-full bg-slate-200 flex items-center justify-center">
                   <FileIcon className="h-12 w-12 text-slate-400" />
                 </div>
-              )}
+              {/* )} */}
               {video.duration && (
                 <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
                   <Clock className="h-3 w-3" />
@@ -136,7 +140,7 @@ export default function VideosTab() {
       {selectedVideo && (
         <ShareDialog
           open={isShareDialogOpen}
-          onOpenChange={setIsShareDialogOpen}
+          onOpenChange={handleShareDialogClose}
           video={selectedVideo}
         />
       )}

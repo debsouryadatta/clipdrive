@@ -105,8 +105,9 @@ export default function UploadDialog({ open, onOpenChange }: UploadDialogProps) 
         }
       );
 
-      // Create thumbnail URL
-      const thumbnailUrl = `${result.data.url}/ik-thumbnail.jpg`;
+      // const thumbnailUrl = `${result.data.url}/ik-thumbnail.jpg`
+      // Don't create a thumbnail URL to avoid transformations
+      const thumbnailUrl = null; // Remove the transformation
       
       // Save to database
       await saveVideoToDatabase({

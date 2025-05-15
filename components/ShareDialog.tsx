@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Dialog, 
   DialogContent,
@@ -13,8 +13,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { X, Link2, Copy, Check, Clock } from "lucide-react";
+import { X, Link2, Copy, Check, Clock, AlertCircle } from "lucide-react";
 import { format, addDays } from 'date-fns';
+import { toast } from "sonner";
+import axios from "axios";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ShareDialogProps {
   open: boolean;
@@ -33,11 +36,64 @@ export default function ShareDialog({ open, onOpenChange, video }: ShareDialogPr
   const [linkGenerated, setLinkGenerated] = useState(false);
   const [shareableLink, setShareableLink] = useState('');
   const [copied, setCopied] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const handleAddEmail = () => {
-    if (currentEmail && !accessEmails.includes(currentEmail)) {
+  // Reset dialog state when video changes or dialog opens
+  useEffect(() => {
+    if (open) {
+      resetDialogState();
+    }
+  }, [open, video.id]);
+
+  const resetDialogState = () => {
+    setIsPublic(true);
+    setAccessEmails([]);
+    setCurrentEmail('');
+    setExpiryDate(null);
+    setLinkGenerated(false);
+    setShareableLink('');
+    setCopied(false);
+    setEmailError(null);
+  };
+
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  };
+
+  const handleAddEmail = async () => {
+    if (!currentEmail || !validateEmail(currentEmail)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+
+    if (accessEmails.includes(currentEmail)) {
+      setEmailError("This email has already been added");
+      return;
+    }
+
+    setIsLoading(true);
+    setEmailError(null);
+
+    try {
+      // Check if email exists in our database
+      const response = await axios.post('/api/check-email', { email: currentEmail });
+      
+      if (!response.data.exists) {
+        setEmailError("This email is not registered on our platform");
+        setIsLoading(false);
+        return;
+      }
+
       setAccessEmails([...accessEmails, currentEmail]);
       setCurrentEmail('');
+    } catch (error) {
+      console.error("Error checking email:", error);
+      setEmailError("Failed to verify email. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -60,19 +116,38 @@ export default function ShareDialog({ open, onOpenChange, video }: ShareDialogPr
     return expiryDate === format(addDays(new Date(), days), 'yyyy-MM-dd');
   };
 
-  const generateLink = () => {
-    // In a real app, this would call an API to create the ShareableLink
-    // For now, we'll simulate with a randomly generated link
-    const randomString = Math.random().toString(36).substring(2, 10);
-    const link = `https://clipdrive.app/share/${randomString}`;
-    setShareableLink(link);
-    setLinkGenerated(true);
+  const generateLink = async () => {
+    setIsLoading(true);
+    
+    try {
+      // Create shareable link via API
+      const response = await axios.post('/api/shareable-links/create', {
+        videoId: video.id,
+        isPublic,
+        accessEmails: !isPublic ? accessEmails : [],
+        expiryDate
+      });
+      
+      setShareableLink(response.data.url);
+      setLinkGenerated(true);
+      
+      // Invalidate the shared links query to refresh the list
+      queryClient.invalidateQueries({ queryKey: ['sharedLinks'] });
+      
+      toast.success("Shareable link created successfully");
+    } catch (error) {
+      console.error("Error generating link:", error);
+      toast.error("Failed to generate shareable link");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(shareableLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    toast.success("Link copied to clipboard");
   };
   
   return (
@@ -138,11 +213,23 @@ export default function ShareDialog({ open, onOpenChange, video }: ShareDialogPr
                   <Input
                     placeholder="Enter email address"
                     value={currentEmail}
-                    onChange={(e) => setCurrentEmail(e.target.value)}
+                    onChange={(e) => {
+                      setCurrentEmail(e.target.value);
+                      setEmailError(null);
+                    }}
                     className="flex-1"
                   />
-                  <Button onClick={handleAddEmail}>Add</Button>
+                  <Button onClick={handleAddEmail} disabled={isLoading}>
+                    {isLoading ? "Checking..." : "Add"}
+                  </Button>
                 </div>
+                
+                {emailError && (
+                  <div className="text-sm text-destructive flex items-center gap-1 mt-1">
+                    <AlertCircle className="h-3.5 w-3.5" />
+                    <span>{emailError}</span>
+                  </div>
+                )}
                 
                 {accessEmails.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
@@ -211,9 +298,19 @@ export default function ShareDialog({ open, onOpenChange, video }: ShareDialogPr
         
         <DialogFooter className="sm:justify-between">
           {!linkGenerated ? (
-            <Button onClick={generateLink} className="w-full">
-              <Link2 className="mr-2 h-4 w-4" />
-              Generate link
+            <Button 
+              onClick={generateLink} 
+              className="w-full"
+              disabled={isLoading || (!isPublic && accessEmails.length === 0)}
+            >
+              {isLoading ? (
+                "Generating..."
+              ) : (
+                <>
+                  <Link2 className="mr-2 h-4 w-4" />
+                  Generate link
+                </>
+              )}
             </Button>
           ) : (
             <Button onClick={() => onOpenChange(false)} className="w-full">
