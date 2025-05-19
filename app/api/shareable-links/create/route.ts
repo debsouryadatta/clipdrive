@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
+import { pushJob } from "@/lib/queue";
 
 export async function POST(request: Request) {
   try {
@@ -45,6 +46,14 @@ export async function POST(request: Request) {
         expiresAt: expiryDate ? new Date(expiryDate) : null
       }
     });
+
+    // If the link is not public, push a job to send an email to the users
+    if (!isPublic) {
+      await pushJob({
+        emails: accessEmails,
+        message: `You have been invited to view the video ${video.fileName} by ${user.username}. Please use the following link to view the video: ${process.env.NEXT_PUBLIC_APP_URL || ''}/share/${shareableLink.id}`
+      });
+    }
 
     // Return the shareable link with a constructed URL
     return NextResponse.json({
